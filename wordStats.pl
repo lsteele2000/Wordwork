@@ -120,24 +120,6 @@ my ($source_ar, $dest_hr, $outputfile) = @_;
     write_source( $outputfile, $dest_hr ) if $modified;
 }
 
-
-=pod
-while (<IN>)
-{
-    #    last if ++$i > 20;
-
-    #    print $_,"\n";
-    foreach my $word (split /\s/ )
-    {
-        next unless length $word == 5;
-        #print( "Skipped $word 1\n" ),
-        next if $word =~ /[[:upper:]]/;
-        #print( "Skipped $word 2\n" ),
-        next if $word =~ /\W/;
-        ++$words{$word};
-    }
-}
-=cut
 sub  add_from_file {
 my ( $sourcefile, $dest_hr, $outputfile ) = @_;
 
