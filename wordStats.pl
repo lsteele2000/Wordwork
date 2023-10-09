@@ -14,6 +14,7 @@ usage( "" ) if $config->{help};
 my $words = input_source($config->{source});
 
 add_words($config->{add}, $words, $config->{source}) if @{$config->{add}};
+remove_words( $config->{remove}, $words, $config->{source}) if @{$config->{remove}};
 print "Word list count:  ", scalar(keys %$words),"\n";
 
 search( $config->{lookup}, $words, True ) if @{$config->{lookup}};
@@ -108,7 +109,13 @@ my ($source_ar, $dest_hr, $outputfile) = @_;
     my $modified = False;
     foreach my $toadd ( @$source_ar )
     {
-        add_from_file( $toadd, $dest_hr, $outputfile ), next if -f $toadd;
+        if  (-f $toadd)
+        {
+            my $addList = words_from_file($toadd);
+            my @toadd = grep { ! $dest_hr->{$_} } @$addList;
+            add_words( \@toadd, $dest_hr, $outputfile );
+            next;
+        }
 
         print "adding '$toadd'";
         print(":ignored, word length must be 5\n"),next unless length($toadd)==5;
@@ -120,31 +127,49 @@ my ($source_ar, $dest_hr, $outputfile) = @_;
     write_source( $outputfile, $dest_hr ) if $modified;
 }
 
-sub  add_from_file {
-my ( $sourcefile, $dest_hr, $outputfile ) = @_;
+sub remove_words {
+my ( $source_ar, $dest_hr, $outputfile ) = @_;
 
-    print "Adding from $sourcefile\n";
+    my $modified = False;
+    foreach my $toDelete ( @$source_ar )
+    {
+        if  (-f $toDelete) 
+        {
+            my $removeList = words_from_file($toDelete);
+            #print Data::Dumper->Dump( [$removeList] );
+            remove_words( $removeList, $dest_hr, $outputfile );
+            next;
+        }
+
+        next unless delete $dest_hr->{$toDelete};
+        print "removed '$toDelete\n'";
+        $modified = True;
+    }
+    write_source( $outputfile, $dest_hr ) if $modified;
+}
+
+sub words_from_file {
+my ($filename) = @_;
+
     my @list;
-    open IN,"$sourcefile";
+    open IN,"$filename";
     while ( <IN> )
     {
         #print;
         chomp;
-        s/[\"|\.|\,|\-|;]//g; 
+        s/[\"|\.|\,|\-|;|_]//g; 
         push @list, 
-            grep { length == 5 && !/[[:upper:]]/ && !/\W/ && !$dest_hr->{$_} } 
+            grep { length == 5 && !/[[:upper:]]/ && !/\W/ }
             split /\s/
             ;
     }
+
     if ( @list )
-    {
+    {   # remove dups
         my %hashit = map { $_ => 1 } @list;
-        add_words( [keys %hashit], $dest_hr, $outputfile );
+        @list = sort keys %hashit;
     }
-    else 
-    {
-        print "No new words found\n";
-    }
+    \@list;
 }
 
 sub report_frequency {
@@ -245,6 +270,7 @@ Usage: [perl] wordStats.pl [options]
         -s,--source filename: use filename as input, default WordList.txt
         -a,--add: add word to source filename, can be specified multiple times
             If 'word' is found to be a local filename that file will be scanned for candidate words to add
+        -r, --remove: inverse of --add
         -l,--lookup: find/displays regex pattern, multiples allow, examples below
         -f,--frequency: displays counts of matches to pattern
         -h, --help: show usage (this)
@@ -292,6 +318,7 @@ my %config = (
     source => "WordList.txt",
     show_config => False,
     add => [],
+    remove => [],
     frequency => [],
     lookup => [],
     help => False,
@@ -299,6 +326,7 @@ my %config = (
 
     GetOptions(
         "add=s@"    => \$config{add},
+        "remove=s@" => \$config{remove},
         "lookup=s@" => \$config{lookup},
         "frequency=s@"  => \$config{frequency},
         "config"    => \$config{show_config},
