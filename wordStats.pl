@@ -104,9 +104,12 @@ my ($tofind_ar, $words_hr, $display) = @_;
 
 sub add_words {
 my ($source_ar, $dest_hr, $outputfile) = @_;
+
     my $modified = False;
     foreach my $toadd ( @$source_ar )
     {
+        add_from_file( $toadd, $dest_hr, $outputfile ), next if -f $toadd;
+
         print "adding '$toadd'";
         print(":ignored, word length must be 5\n"),next unless length($toadd)==5;
         print(":ignored, already present\n" ),next if $dest_hr->{$toadd};
@@ -115,6 +118,51 @@ my ($source_ar, $dest_hr, $outputfile) = @_;
         $dest_hr->{$toadd} = 1;
     }
     write_source( $outputfile, $dest_hr ) if $modified;
+}
+
+
+=pod
+while (<IN>)
+{
+    #    last if ++$i > 20;
+
+    #    print $_,"\n";
+    foreach my $word (split /\s/ )
+    {
+        next unless length $word == 5;
+        #print( "Skipped $word 1\n" ),
+        next if $word =~ /[[:upper:]]/;
+        #print( "Skipped $word 2\n" ),
+        next if $word =~ /\W/;
+        ++$words{$word};
+    }
+}
+=cut
+sub  add_from_file {
+my ( $sourcefile, $dest_hr, $outputfile ) = @_;
+
+    print "Adding from $sourcefile\n";
+    my @list;
+    open IN,"$sourcefile";
+    while ( <IN> )
+    {
+        #print;
+        chomp;
+        s/[\"|\.|\,|\-|;]//g; 
+        push @list, 
+            grep { length == 5 && !/[[:upper:]]/ && !/\W/ && !$dest_hr->{$_} } 
+            split /\s/
+            ;
+    }
+    if ( @list )
+    {
+        my %hashit = map { $_ => 1 } @list;
+        add_words( [keys %hashit], $dest_hr, $outputfile );
+    }
+    else 
+    {
+        print "No new words found\n";
+    }
 }
 
 sub report_frequency {
@@ -214,6 +262,7 @@ Usage: [perl] wordStats.pl [options]
         -c, --config: show configuration
         -s,--source filename: use filename as input, default WordList.txt
         -a,--add: add word to source filename, can be specified multiple times
+            If 'word' is found to be a local filename that file will be scanned for candidate words to add
         -l,--lookup: find/displays regex pattern, multiples allow, examples below
         -f,--frequency: displays counts of matches to pattern
         -h, --help: show usage (this)
