@@ -29,12 +29,12 @@ my ($patterns, $words_hr) = @_;
     {
         my ($filter) = $pattern =~ /F(.+)/;
         $pattern =~ s/F$filter// if $filter;
-        $filter = "P1.P2.P3.P4.P5." unless $filter;
+        $filter = "1.2.3.4.5." unless $filter;
         #print "Freq filter $filter\n";
         my @posFilters;
         foreach my $pos ( 1 .. 5 )
         {
-            my ($pf) = $filter =~ /P$pos([^P]+)/;
+            my ($pf) = $filter =~ /$pos([^\d]+)/;
             $pf =~ s/V/[aeiouy]/g if $pf;
             $pf =~ s/C/[^aeiouy]/g if $pf;
             $posFilters[$pos-1] = $pf;
@@ -195,52 +195,6 @@ my ($letterStats) = @_;
     }
 }
 
-sub process_words {
-my ($hrWords ) = @_;
-
-    my %letters;
-    foreach my $word (keys %$hrWords)
-    {
-        my %wordStats;
-        #print $word,"\n";
-        my @letters = split "",$word;
-        my $index = -1;
-        while ( @letters )
-        {
-            #my $index = @letters;
-            ++$index;
-
-            my $letter = shift @letters;
-            ++$letters{total};
-            #print "$index, $letter\n";
-
-            my $blob = $letters{ $letter };
-            $letters{ $letter } = $blob = {
-                letter => $letter,
-                total => 0,
-                positions => [0,0,0,0,0],
-                frequency => [0,0,0,0,0],
-                } unless $blob;
-            ++$blob->{total};
-            ++$blob->{positions}->[$index];
-
-            ++$wordStats{$letter};
-        }
-
-        #print Data::Dumper->Dump([%wordStats]);
-        foreach my $letter (keys %wordStats)
-        {
-            my $letterFreq = $letters{$letter}->{frequency};
-            die unless $letterFreq;
-
-            #print "$letter .. $occurances\n";
-            ++$letterFreq->[$wordStats{$letter}-1];
-        }
-    }
-    #print Data::Dumper->Dump( [%letters] );
-    \%letters;
-}
-
 sub input_source {
 my ($input) = @_;
     die "Source $input not found or empty\n" unless -f $input and -s $input;
@@ -303,8 +257,8 @@ Usage: [perl] wordStats.pl [options]
                 template: FP1filterP2filter...
 
             examples
-                -f ".FP1V" : letter frequency count of vowels in first position in all words
-                -f "y$\FP4.": letter frequency count of any char preceding a final 'y'
+                -f ".F1V" : letter frequency count of vowels in first position in all words
+                -f "y$\F4.": letter frequency count of any char preceding a final 'y'
 
                     
 eom
