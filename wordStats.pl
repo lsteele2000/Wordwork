@@ -244,10 +244,9 @@ my ($hrWords ) = @_;
 sub input_source {
 my ($input) = @_;
     die "Source $input not found or empty\n" unless -f $input and -s $input;
-    open IN, $input || die "Could not open $input\n";
-    my %words = map { chomp; $_ => 1 } <IN>;
-    close IN;   # close in case of rewrite
-    \%words;
+    my %wordHash = map { $_ => 1 } @{words_from_file($input)};
+    #print Data::Dumper->Dump( [%wordHash] );
+    \%wordHash;
 }
 
 sub write_source {
