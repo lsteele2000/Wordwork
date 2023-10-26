@@ -38,6 +38,8 @@ my ($patterns, $words_hr, $options) = @_;
         $pattern =~ s/C/[^aeiouy]/g;
         # force anchor to beginning 
         $pattern = "^$pattern" unless $pattern =~ /^\^/;
+        die( "leading wildcard disallowed with grouping options\n" )
+            if $pattern =~ /^\^\./;
         print "matching pattern: $pattern\n";
 
         my $totalStats = LetterStats->new();
