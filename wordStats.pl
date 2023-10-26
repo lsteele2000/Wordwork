@@ -272,7 +272,10 @@ Usage: [perl] wordStats.pl [options]
         -l,--lookup: find/displays regex pattern, multiples allowed, examples below
         -f,--frequency: displays counts of matches to pattern
         -gr, --groups: report frequency of pattern, multiples allowed 
-        -go, --gopt: groups reporting options, until generalized 
+        -go, --gopt: groups reporting options, work in progress 
+            format: opt=val
+            options:
+                min=integer : minimal total count threshold to include in report
         -h, --help: show usage (this)
 
 
@@ -297,7 +300,7 @@ Usage: [perl] wordStats.pl [options]
                     and contains a 't'
                     and the third position is not an 'i' and the fourth position in not a 't'
 
-            Note: -f option likely being superceded by -g option
+            Note: -f option likely being superceded by -gr option
             F specifes a letter frequency filter, following a matching pattern
                 -f option only
                 defaults to any char in each position
