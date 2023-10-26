@@ -43,14 +43,14 @@ my ($this, $pattern,$positions) = @_;
 };
 
 sub report {
-    my ($this,%options) = @_;
-    #print Data::Dumper->Dump( [$this] );
+    my ($this,$options) = @_;
     my $patRef = $this->patterns();
     foreach my $key ( 
         sort { $patRef->{$b}->{total} <=> $patRef->{$a}->{total} }
         keys %$patRef )
     {
 
+        next if $patRef->{$key}->{total} < $options->{min};
         print "$key: total $patRef->{$key}->{total}: word position [",
             join( ',', @{$patRef->{$key}->{positions}} ),
             "]",

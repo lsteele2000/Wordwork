@@ -26,11 +26,11 @@ print "Word list count:  ", scalar(keys %$words),"\n";
 
 search( $config->{lookup}, $words, True ) if @{$config->{lookup}};
 frequency( $config->{frequency}, $words ) if @{$config->{frequency}};
-groupings( $config->{groupings}, $words ) if @{$config->{groupings}};
+groupings( $config->{groupings}, $words, $config->{gopts} ) if @{$config->{groupings}};
 exit;
 
 sub groupings {
-my ($patterns, $words_hr) = @_;
+my ($patterns, $words_hr, $options) = @_;
 
     foreach my $pattern (@$patterns)
     {
@@ -61,7 +61,7 @@ my ($patterns, $words_hr) = @_;
             #print $word,"\n",Data::Dumper->Dump( [$wordStats] );
             $totalStats->merge( $wordStats );
         }
-        $totalStats->report();
+        $totalStats->report($options); #"min"=>2);
     }
 }
 
@@ -271,7 +271,8 @@ Usage: [perl] wordStats.pl [options]
         -r, --remove: inverse of --add
         -l,--lookup: find/displays regex pattern, multiples allowed, examples below
         -f,--frequency: displays counts of matches to pattern
-        -g, --groups: report frequency of pattern, multiples allowed 
+        -gr, --groups: report frequency of pattern, multiples allowed 
+        -go, --gopt: groups reporting options, until generalized 
         -h, --help: show usage (this)
 
 
@@ -322,6 +323,7 @@ my %config = (
     frequency => [],
     lookup => [],
     groupings => [],
+    gopts => {},
     help => False,
     );
 
@@ -330,6 +332,7 @@ my %config = (
         "remove=s@" => \$config{remove},
         "lookup=s@" => \$config{lookup},
         "groups=s@" => \$config{groupings},
+        "gopts=s%" => \$config{gopts},
         "frequency=s@"  => \$config{frequency},
         "config"    => \$config{show_config},
         "help"      => \$config{help},
