@@ -1,8 +1,15 @@
 
 use strict;
+
+BEGIN {
+    unshift @INC, ".";
+}
+
 use File::Copy;
 use Getopt::Long;
 use Data::Dumper;
+
+use LetterStats;
 
 use constant True => 1;
 use constant False => 0;
@@ -19,11 +26,49 @@ print "Word list count:  ", scalar(keys %$words),"\n";
 
 search( $config->{lookup}, $words, True ) if @{$config->{lookup}};
 frequency( $config->{frequency}, $words ) if @{$config->{frequency}};
+groupings( $config->{groupings}, $words ) if @{$config->{groupings}};
 exit;
+
+sub groupings {
+my ($patterns, $words_hr) = @_;
+
+    foreach my $pattern (@$patterns)
+    {
+        $pattern =~ s/V/[aeiouy]/g;
+        $pattern =~ s/C/[^aeiouy]/g;
+        # force anchor to beginning 
+        $pattern = "^$pattern" unless $pattern =~ /^\^/;
+        print "matching pattern: $pattern\n";
+
+        my $totalStats = LetterStats->new();
+        foreach my $word ( keys %$words_hr )
+        {
+            my $wordStats = LetterStats->new();
+            my $matches = 0;
+            foreach my $pos ( 0 .. length($word)-1 )
+            {
+                my $tomatch = substr($word, $pos);
+                #print "$tomatch against $pattern\n";
+                my ($match) = $tomatch =~ /($pattern)/;
+                next unless $match; 
+
+                ++$matches;
+                my $offset = [];
+                $offset->[$pos] = 1;
+                $wordStats->inc_pattern( $match, $offset );
+            }
+            next unless $matches;
+            #print $word,"\n",Data::Dumper->Dump( [$wordStats] );
+            $totalStats->merge( $wordStats );
+        }
+        $totalStats->report();
+    }
+}
 
 sub frequency {
 my ($patterns, $words_hr) = @_;
-    
+   
+# XXX need revisit, can likely refactor or be replaced by groupings
     my %letters;
     foreach my $pattern ( @$patterns )
     {
@@ -224,8 +269,9 @@ Usage: [perl] wordStats.pl [options]
         -a,--add: add word to source filename, can be specified multiple times
             If 'word' is found to be a local filename that file will be scanned for candidate words to add
         -r, --remove: inverse of --add
-        -l,--lookup: find/displays regex pattern, multiples allow, examples below
+        -l,--lookup: find/displays regex pattern, multiples allowed, examples below
         -f,--frequency: displays counts of matches to pattern
+        -g, --groups: report frequency of pattern, multiples allowed 
         -h, --help: show usage (this)
 
 
@@ -250,6 +296,7 @@ Usage: [perl] wordStats.pl [options]
                     and contains a 't'
                     and the third position is not an 'i' and the fourth position in not a 't'
 
+            Note: -f option likely being superceded by -g option
             F specifes a letter frequency filter, following a matching pattern
                 -f option only
                 defaults to any char in each position
@@ -274,6 +321,7 @@ my %config = (
     remove => [],
     frequency => [],
     lookup => [],
+    groupings => [],
     help => False,
     );
 
@@ -281,6 +329,7 @@ my %config = (
         "add=s@"    => \$config{add},
         "remove=s@" => \$config{remove},
         "lookup=s@" => \$config{lookup},
+        "groups=s@" => \$config{groupings},
         "frequency=s@"  => \$config{frequency},
         "config"    => \$config{show_config},
         "help"      => \$config{help},
