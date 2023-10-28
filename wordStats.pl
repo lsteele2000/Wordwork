@@ -164,7 +164,18 @@ my ($source_ar, $dest_hr, $outputfile) = @_;
             next;
         }
 
+        $toadd =~ s/\s//g;
+        if ( $toadd =~ /,/ )
+        {
+            my @csvlist = split /\,/,$toadd;
+            print Data::Dumper->Dump( [@csvlist] );
+            add_words( \@csvlist, $dest_hr, $outputfile );
+            next;
+        }
+
+        $toadd = lc $toadd;
         print "adding '$toadd'";
+        print(":ignored, non-alpha input\n"),next if $toadd =~ /[^a-z]/;
         print(":ignored, word length must be 5\n"),next unless length($toadd)==5;
         print(":ignored, already present\n" ),next if $dest_hr->{$toadd};
         print("\n");

@@ -198,6 +198,7 @@ chair
 chalk
 chaos
 chaps
+chard
 charm
 chary
 chase
@@ -224,6 +225,7 @@ civet
 civil
 clack
 claim
+clamp
 clang
 claws
 clean
@@ -303,6 +305,7 @@ debts
 deity
 delay
 devil
+diode
 dirty
 dived
 dodge
@@ -315,7 +318,9 @@ doubt
 dough
 dozed
 dozen
+drama
 drank
+drawl
 drawn
 draws
 dream
@@ -335,6 +340,7 @@ drunk
 ducks
 dukes
 dummy
+dupes
 dusky
 dusty
 dying
@@ -657,6 +663,7 @@ lupus
 lurks
 lying
 lynch
+lysin
 magic
 major
 makes
@@ -675,10 +682,12 @@ metal
 metre
 midst
 might
+milch
 miles
 mimed
 minds
 miner
+minor
 mirth
 mixed
 mixer
@@ -743,6 +752,7 @@ ovary
 owing
 owned
 owner
+pacer
 paces
 pages
 pains
@@ -779,16 +789,19 @@ pined
 pints
 pious
 pipes
+pique
 pitch
 pivot
 place
 plack
+plaid
 plain
 plane
 plank
 plans
 plant
 plate
+playa
 plays
 plied
 pluck
@@ -900,6 +913,7 @@ scary
 scene
 scent
 scold
+scone
 scoop
 scope
 scour
@@ -986,6 +1000,7 @@ slide
 sling
 slink
 slips
+sloop
 slope
 slung
 slunk
@@ -1040,6 +1055,7 @@ spool
 spoon
 sport
 spots
+spout
 spunk
 squaw
 stack
@@ -1105,6 +1121,7 @@ sweet
 swell
 swift
 swine
+swoop
 sword
 swore
 sworn
@@ -1118,6 +1135,7 @@ talks
 tarts
 taste
 taxes
+taxis
 teach
 teams
 tears
@@ -1137,6 +1155,7 @@ thick
 thing
 think
 third
+thong
 those
 three
 threw
